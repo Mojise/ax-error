@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ax_ripple_color">#BDBDBD</color>
+    <color name="ax_ripple_color_light">#E0E0E0</color>
+
+    <color name="ax_error_primary">#70a6ff</color>
+
+    <color name="ax_error_system_bar">@color/ax_error_background</color>
+    <color name="ax_error_background">#f8f8f8</color>
+    <color name="ax_error_log_background">#EFEFEF</color>
+
+    <color name="ax_error_text_color_dark">#4e4e4e</color>
+    <color name="ax_error_text_color_light">#9f9f9f</color>
+    <color name="ax_error_text_color_very_light">#C3C3C3</color>
+</resources>
