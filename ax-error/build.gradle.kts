@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     kotlin("kapt")
+    id("maven-publish")
 }
 
 android {
@@ -56,4 +57,26 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+
+afterEvaluate {
+    configure<PublishingExtension> {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+
+                groupId = "com.github.mojise.ax-error" // 깃허브 이름 예제
+                artifactId = "Ax-Error" // 공개할 라이브러리의 이름 예제
+                version = "1.0.0" // 버전 예제
+            }
+            create<MavenPublication>("debug") {
+                from(components["debug"])
+
+                groupId = "com.github.mojise.ax-error" // 깃허브 이름 예제
+                artifactId = "Ax-Error" // 공개할 라이브러리의 이름 예제
+                version = "1.0.0" // 버전 예제
+            }
+        }
+    }
 }
