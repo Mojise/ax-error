@@ -41,7 +41,6 @@ android {
     }
     buildFeatures {
         buildConfig = true
-        dataBinding = true
     }
 }
 
@@ -50,9 +49,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-
-    implementation(libs.kakao.sdk.v2.share) // 메시지(카카오톡 공유)
-    implementation(libs.kakao.sdk.v2.talk) // 친구, 메시지(카카오톡)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -5,73 +5,38 @@ import android.app.Application
 import android.os.Bundle
 import android.os.Process
 import android.util.Log
-import com.kakao.sdk.common.KakaoSdk
 import java.util.ArrayDeque
 import java.util.Deque
-
-/**
- * - [AxExceptionHandler]를 [Thread]의 기본 [Thread.UncaughtExceptionHandler]로 등록
- * - [Application.onCreate]에서 `registerAxExceptionHandler()` 함수를 호출하여 앱 전역에서 발생하는 Exception을 처리함
- * - 앱 실행 중 Exception이 발생 시, 앱을 종료하지 않고 에러 화면([AxErrorActivity])을 보여줌
- *
- * case 1. 문의하기 버튼을 숨길 경우
- *  ```kotlin
- *  class MyApplication : Application {
- *      fun onCreate() {
- *          registerAxExceptionHandler()
- *      }
- *  }
- *  ```
- *
- * case 2. 문의하기 버튼을 표시할 경우
- *  ```kotlin
- *  class MyApplication : Application {
- *      fun onCreate() {
- *          KakaoSdk.init(this, "${NATIVE_APP_KEY}")
- *          registerAxExceptionHandler("${KAKAO_PUBLIC_CHANNEL_ID}")
- *      }
- *  }
- *  ```
- * @param kakaoPublicChannelId 카카오톡 플러스 친구 채널 아이디. (null이면 [AxErrorActivity] 화면 내의 "문의하기" 버튼을 표시하지 않음)
- *
- */
-fun Application.registerAxExceptionHandler(
-    kakaoPublicChannelId: String? = null,
-) {
-    if (kakaoPublicChannelId != null) {
-        try {
-            KakaoSdk.appKey.isBlank()
-        } catch (e: UninitializedPropertyAccessException) {
-            throw IllegalStateException("KakaoSdk.init() 을 먼저 호출해야 합니다!!")
-        }
-    }
-
-    AxErrorActivity.GlobalOption.kakaoPublicChannelIdForHelpButton = kakaoPublicChannelId
-
-    val crashlyticsExceptionHandler = Thread.getDefaultUncaughtExceptionHandler() ?: return
-    val axExceptionHandler = AxExceptionHandler(this, crashlyticsExceptionHandler)
-
-    Thread.setDefaultUncaughtExceptionHandler(axExceptionHandler)
-}
 
 /**
  * UnCaught Thread Exception 핸들러 (Thread에서 캐치되지 않은 Exception 핸들러)
  *
  * @see <a href="https://medium.com/prnd/%EC%95%84%EB%A6%84%EB%8B%B5%EA%B2%8C-%EC%95%B1-%EC%98%A4%EB%A5%98-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0-8bf9a46df515">아름답게 안드로이드 앱 오류 처리하기</a>
  */
-internal class AxExceptionHandler(
+internal class AxGlobalExceptionHandler(
     private val application: Application,
     private val crashlyticsExceptionHandler: Thread.UncaughtExceptionHandler,
 ) : Thread.UncaughtExceptionHandler, Application.ActivityLifecycleCallbacks {
 
     private val activityStack: Deque<Activity> = ArrayDeque()
 
+    private val Activity.isErrorActivity: Boolean
+        get() = this is AxErrorActivity
+
+    /**
+     * - 현재 활성화 된 AxErrorActivity 카운트
+     * - AxErrorActivity 내에서 Exception이 발생할 경우, 무한 루프를 방지하기 위해 사용
+     */
+    private var errorActivityActivationCount = 0
+
     init {
         application.registerActivityLifecycleCallbacks(this)
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        if (isSkipActivity(activity).not()) {
+        if (activity.isErrorActivity) {
+            errorActivityActivationCount++
+        } else {
             activityStack.push(activity)
         }
         logLifecycle(activity, "Created")
@@ -98,18 +63,23 @@ internal class AxExceptionHandler(
     }
 
     override fun onActivityDestroyed(activity: Activity) {
-        if (isSkipActivity(activity).not()) {
+        if (activity.isErrorActivity) {
+            errorActivityActivationCount--
+        } else {
             activityStack.remove(activity)
         }
         logLifecycle(activity, "Destroyed")
     }
 
-    private fun isSkipActivity(activity: Activity) = activity is AxErrorActivity
-
     override fun uncaughtException(thread: Thread, throwable: Throwable) {
-        Log.e(TAG, "uncaughtException: ProcessId=${Process.myPid()}")
+        Log.e(TAG, "uncaughtException :: ProcessId=${Process.myPid()} | Thread=$thread")
+        Log.e(TAG, "uncaughtException :: errorActivityCount=$errorActivityActivationCount")
 
-        startErrorActivity(throwable)
+        if (errorActivityActivationCount > 0) {
+            Log.e(TAG, "uncaughtException :: Already showing error activity.")
+        } else {
+            startErrorActivity(throwable)
+        }
 
         crashlyticsExceptionHandler.uncaughtException(thread, throwable)
         // Process.killProcess(Process.myPid())
@@ -117,7 +87,7 @@ internal class AxExceptionHandler(
     }
 
     private fun startErrorActivity(throwable: Throwable) {
-        AxErrorActivity.Builder(application)
+        AxError.FullScreenBuilder(application)
             .startFromExceptionHandler(activityStack, throwable)
     }
 
@@ -138,7 +108,7 @@ internal class AxExceptionHandler(
             }
         }
 
-        if (isSkipActivity(activity)) {
+        if (activity.isErrorActivity) {
             Log.e(TAG, logMessage)
         } else {
             Log.i(TAG, logMessage)
@@ -146,6 +116,6 @@ internal class AxExceptionHandler(
     }
 
     companion object {
-        private const val TAG = AxErrorConstants.TAG
+        private const val TAG = AxError.TAG
     }
 }

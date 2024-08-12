@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="error_title">일시적인 오류입니다<b></b></string>
-    <string name="error_sub_title">새로고침을 눌러 페이지를 다시 불러올 수 있습니다.&lt;br/>문제가 반복된다면 문의하기를 눌러주세요.</string>
+    <string name="ax_error_library_error_title">일시적인 오류입니다<b></b></string>
+    <string name="ax_error_library_error_sub_title">새로고침을 눌러 페이지를 다시 불러올 수 있습니다.&lt;br/>문제가 반복된다면 문의하기를 눌러주세요.</string>
 <!--    <string name="error_guide_message_description">&lt;b>새로고침&lt;/b>을 눌러 페이지를 다시 불러올 수 있습니다.&lt;br/>문제가 반복된다면 &lt;b>문의하기&lt;/b>를 눌러주세요.</string>-->
-    <string name="refresh_button_text">새로고침</string>
-    <string name="copy_error_log_button_text">복사하기</string>
-    <string name="copy_button_guide_message">※ 1:1 문의 시, 위 &lt;b>에러 메시지를 복사&lt;/b>하여 &lt;b>문의 내용과 함께&lt;/b> 보내주시면 더 빠르고 정확한 안내가 가능합니다.</string>
-    <string name="help_button_text">문의하기</string>
-    <string name="text_help_left">같은 문제가 반복되시나요?</string>
-    <string name="toast_copied">복사되었습니다</string>
-    <string name="error_log_text_sample">
+    <string name="ax_error_library_refresh_button_text">새로고침</string>
+    <string name="ax_error_library_copy_error_log_button_text">복사하기</string>
+    <string name="ax_error_library_copy_button_guide_message">※ 1:1 문의 시, 위 &lt;b>에러 메시지를 복사&lt;/b>하여 &lt;b>문의 내용과 함께&lt;/b> 보내주시면 더 빠르고 정확한 안내가 가능합니다.</string>
+    <string name="ax_error_library_help_button_text">문의하기</string>
+    <string name="ax_error_library_text_help_left">같은 문제가 반복되시나요?</string>
+    <string name="ax_error_library_toast_copied">복사되었습니다</string>
+    <string name="ax_error_library_error_log_text_sample">
         java.lang.ArithmeticException: / by zero
             at com.example.myapp.MainActivity.onClick(MainActivity.java:42)
             at android.view.View.performClick(View.java:5637)
@@ -22,4 +22,5 @@
             at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:886)
             at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:776)
     </string>
+    <string name="ax_error_library_toast_message_help_button_error">문제가 발생하였습니다. 잠시 후 다시 시도해 주세요.</string>
 </resources>

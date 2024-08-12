@@ -45,7 +45,6 @@ android {
     }
     buildFeatures {
         buildConfig = true
-        dataBinding = true
     }
     defaultConfig {
         // buildConfigStringFields("KAKAO_SDK_APP_KEY", "KAKAO_CHANNEL_PUBLIC_ID")
@@ -61,8 +60,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
-    implementation(libs.kakao.sdk.v2.share) // 메시지(카카오톡 공유)
-    implementation(libs.kakao.sdk.v2.talk) // 친구, 메시지(카카오톡)
+    // implementation(libs.kakao.sdk.v2.share) // 메시지(카카오톡 공유)
+    // implementation(libs.kakao.sdk.v2.talk) // 친구, 메시지(카카오톡)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
