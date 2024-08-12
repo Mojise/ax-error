@@ -48,7 +48,7 @@ android {
         dataBinding = true
     }
     defaultConfig {
-        buildConfigStringFields("KAKAO_SDK_APP_KEY", "KAKAO_CHANNEL_PUBLIC_ID")
+        // buildConfigStringFields("KAKAO_SDK_APP_KEY", "KAKAO_CHANNEL_PUBLIC_ID")
     }
 }
 
