@@ -49,6 +49,9 @@ internal data class AxErrorActivityUiData(
     }
 }
 
+/**
+ *
+ */
 class AxErrorActivity : AppCompatActivity() {
 
     private lateinit var binding: AxErrorActivityViewBinding
@@ -92,8 +95,8 @@ class AxErrorActivity : AppCompatActivity() {
 
     private fun initViewAndListeners() {
         with (binding) {
-            scrollViewErrorLogText.isVisible = BuildConfig.DEBUG
-            llCopyButtonAndGuideMessage.isVisible = BuildConfig.DEBUG
+            scrollViewErrorLogText.isVisible = AxError.GlobalOption.isErrorLogMessageVisible
+            llCopyButtonAndGuideMessage.isVisible = AxError.GlobalOption.isErrorLogMessageVisible
 
             tvErrorTitle.text = uiData.errorTitle.toStringFromHtml()
             tvErrorSubTitle.text = uiData.errorSubTitle.toStringFromHtml()
@@ -114,11 +117,11 @@ class AxErrorActivity : AppCompatActivity() {
                 finishAndStartActivitiesInStackSequentially()
             }
 
-            textHelpLeft.isVisible = AxError.isHelpButtonVisible
-            btnHelp.isVisible = AxError.isHelpButtonVisible
+            textHelpLeft.isVisible = AxError.GlobalOption.isHelpButtonVisible
+            btnHelp.isVisible = AxError.GlobalOption.isHelpButtonVisible
             btnHelp.setOnClickListener {
                 try {
-                    AxError.onHelpButtonClickedListener?.onHelpButtonClicked(this@AxErrorActivity)
+                    AxError.GlobalOption.onHelpButtonClickedListener?.onHelpButtonClicked(this@AxErrorActivity)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Toast.makeText(this@AxErrorActivity, R.string.ax_error_library_toast_message_help_button_error, Toast.LENGTH_SHORT).show()

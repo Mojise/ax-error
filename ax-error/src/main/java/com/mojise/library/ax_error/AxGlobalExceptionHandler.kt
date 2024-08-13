@@ -9,9 +9,12 @@ import java.util.ArrayDeque
 import java.util.Deque
 
 /**
- * UnCaught Thread Exception 핸들러 (Thread에서 캐치되지 않은 Exception 핸들러)
+ * - UnCaught Thread Exception 핸들러 (Thread 에서 캐치되지 않은 Exception을 처리하는 핸들러)
+ * - 앱 전역에서 발생하는 Exception을 처리하고, 안드로이드 시스템의 "앱 중지 팝업" 대신 "커스텀 에러 화면([AxErrorActivity])"을 보여주는 기능을 제공함.
  *
- * @see <a href="https://medium.com/prnd/%EC%95%84%EB%A6%84%EB%8B%B5%EA%B2%8C-%EC%95%B1-%EC%98%A4%EB%A5%98-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0-8bf9a46df515">아름답게 안드로이드 앱 오류 처리하기</a>
+ * @see <a href="https://medium.com/prnd/%EC%95%84%EB%A6%84%EB%8B%B5%EA%B2%8C-%EC%95%B1-%EC%98%A4%EB%A5%98-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0-8bf9a46df515">(참고) 아름답게 안드로이드 앱 오류 처리하기</a>
+ * @see Thread.UncaughtExceptionHandler
+ * @see Application.ActivityLifecycleCallbacks
  */
 internal class AxGlobalExceptionHandler(
     private val application: Application,

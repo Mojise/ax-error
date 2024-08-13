@@ -19,8 +19,8 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-kakao-sdk-v2-share = { module = "com.kakao.sdk:v2-share", version.ref = "kakaoSdkv2Talk" }
-kakao-sdk-v2-talk = { module = "com.kakao.sdk:v2-talk", version.ref = "kakaoSdkv2Talk" }
+#kakao-sdk-v2-share = { module = "com.kakao.sdk:v2-share", version.ref = "kakaoSdkv2Talk" }
+#kakao-sdk-v2-talk = { module = "com.kakao.sdk:v2-talk", version.ref = "kakaoSdkv2Talk" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]

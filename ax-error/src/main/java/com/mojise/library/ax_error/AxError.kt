@@ -7,82 +7,107 @@ import android.content.Intent
 import androidx.annotation.StringRes
 import com.mojise.library.ax_error.AxErrorActivity.Companion.EXTRA_ERROR_DATA
 import com.mojise.library.ax_error.AxErrorActivity.Companion.EXTRA_INTENT_ARRAY
+import java.lang.Thread.UncaughtExceptionHandler
 import java.util.Deque
 
 /**
- * - AxError 라이브러리의 Global Exception Handler 등록 및 설정을 위한 객체
- * - 앱 전역에서 발생하는 Exception을 처리하고, 에러 화면을 보여주는 기능을 제공함
+ * AxError 라이브러리 사용을 위한 object 클래스.
  *
- * **Kotlin**
- * ```kotlin
- * class KotlinApplication : Application() {
- *
- *     override fun onCreate() {
- *         super.onCreate()
- *
- *         // KakaoSdk.init(this, BuildConfig.KAKAO_SDK_APP_KEY)
- *
- *         // 앱 전역에 에러 핸들러를 등록
- *         AxError.registerAxGlobalExceptionHandler(this)
- *         // 에러 화면 내의 "문의하기" 버튼 표시하기 및 버튼 클릭 리스너 설정.
- *         AxError.setHelpButtonShowingAndOnClickedListener { context ->
- *             // ex) KakaoUtil.openKakaoChannel(context, BuildConfig.KAKAO_CHANNEL_PUBLIC_ID)
- *         }
- *     }
- * }
- * ```
- *
- * **Java**
- * ```java
- * public class JavaApplication extends Application {
- *
- *     @Override
- *     public void onCreate() {
- *         super.onCreate();
- *
- *         // KakaoSdk.init(this, FakeBuildConfig.KAKAO_SDK_APP_KEY);
- *
- *         // 앱 전역에 에러 핸들러를 등록
- *         AxError.registerAxGlobalExceptionHandler(this);
- *         // 에러 화면 내의 "문의하기" 버튼 표시하기 및 버튼 클릭 리스너 설정.
- *         AxError.setHelpButtonShowingAndOnClickedListener((context) -> {
- *             // ex) KakaoUtil.openKakaoChannel(context, BuildConfig.KAKAO_CHANNEL_PUBLIC_ID);
- *         });
- *     }
- * }
- * ```
+ * @see AxError.Executor
+ * @see AxError.FullScreenBuilder
  */
 object AxError {
 
     internal const val TAG = "AxError"
 
-    internal var onHelpButtonClickedListener: OnHelpButtonClickedListener? = null
-
-    internal val isHelpButtonVisible: Boolean
-        get() = onHelpButtonClickedListener != null
-
-    /**
-     * - [AxGlobalExceptionHandler]를 [Thread]의 기본 [Thread.UncaughtExceptionHandler]로 등록
-     * - [Application.onCreate]에서 `registerAxExceptionHandler()` 함수를 호출하여 앱 전역에서 발생하는 Exception을 처리함
-     * - 앱 실행 중 Exception이 발생 시, 앱을 종료하지 않고 에러 화면([AxErrorActivity])을 보여줌
-     */
-    @JvmStatic
-    fun registerAxGlobalExceptionHandler(application: Application) {
-        val crashlyticsExceptionHandler = Thread.getDefaultUncaughtExceptionHandler() ?: return
-        val exceptionHandler = AxGlobalExceptionHandler(application, crashlyticsExceptionHandler)
-
-        Thread.setDefaultUncaughtExceptionHandler(exceptionHandler)
+    internal object GlobalOption {
+        internal var isHelpButtonVisible: Boolean = false
+        internal var isErrorLogMessageVisible: Boolean = false
+        internal var onHelpButtonClickedListener: OnHelpButtonClickedListener? = null
     }
 
     /**
-     * - 에러 화면 내의 "문의하기" 버튼 클릭 리스너 설정.
-     * - "문의하기" 버튼을 표시하려면 [setHelpButtonShowingAndOnClickedListener] 함수를 호출하여 리스너를 설정해야 함.
+     * - AxError 라이브러리의 Global Exception Handler 등록 및 설정을 위한 Executor.
+     * - 앱 전역에서 발생하는 Exception을 처리하고, 안드로이드 시스템 앱 중지 팝업 대신 에러 화면([AxErrorActivity])을 보여주는 기능을 제공함.
+     * - [Application.onCreate]에서 생성해서 실행하기.
+     *
+     * **Kotlin**
+     * ```kotlin
+     * class KotlinApplication : Application() {
+     *
+     *     override fun onCreate() {
+     *         super.onCreate()
+     *
+     *         // KakaoSdk.init(this, FakeBuildConfig.KAKAO_SDK_APP_KEY)
+     *
+     *         AxError.Executor(this)
+     *             .isHelpButtonVisible(false)
+     *             .isErrorLogMessageVisible(BuildConfig.DEBUG)
+     *             .setOnHelpButtonClickedListener { context ->
+     *                 // ex) KakaoUtil.openKakaoChannel(context, BuildConfig.KAKAO_CHANNEL_PUBLIC_ID)
+     *             }
+     *             .registerGlobalExceptionHandler()
+     *             .execute()
+     *     }
+     * }
+     * ```
+     *
+     * **Java**
+     * ```java
+     * public class JavaApplication extends Application {
+     *
+     *     @Override
+     *     public void onCreate() {
+     *         super.onCreate();
+     *
+     *         // KakaoSdk.init(this, FakeBuildConfig.KAKAO_SDK_APP_KEY);
+     *
+     *         new AxError.Executor(this)
+     *                 .isHelpButtonVisible(true)
+     *                 .isErrorLogMessageVisible(BuildConfig.DEBUG)
+     *                 .setOnHelpButtonClickedListener((context) -> {
+     *                     // ex) KakaoUtil.openKakaoChannel(context, BuildConfig.KAKAO_CHANNEL_PUBLIC_ID);
+     *                 })
+     *                 .registerGlobalExceptionHandler()
+     *                 .execute();
+     *     }
+     * }
+     * ```
+     *
+     * @see AxGlobalExceptionHandler
+     * @see AxErrorActivity
      */
-    @JvmStatic
-    fun setHelpButtonShowingAndOnClickedListener(onHelpButtonClickedListener: OnHelpButtonClickedListener) {
-        this.onHelpButtonClickedListener = onHelpButtonClickedListener
-    }
+    class Executor(private val application: Application) {
 
+        private var exceptionHandler: UncaughtExceptionHandler? = null
+
+        /** 에러 화면([AxErrorActivity]) 내의 "문의하기" 버튼 표시 여부 (기본값: false) */
+        fun isHelpButtonVisible(isVisible: Boolean) = apply {
+            GlobalOption.isHelpButtonVisible = isVisible
+        }
+
+        /** 에러 화면([AxErrorActivity]) 내의 에러 로그 메시지 표시 여부 (기본값: false) */
+        fun isErrorLogMessageVisible(isVisible: Boolean) = apply {
+            GlobalOption.isErrorLogMessageVisible = isVisible
+        }
+
+        /** 에러 화면([AxErrorActivity]) 내의 "문의하기" 버튼 클릭 리스너 설정 */
+        fun setOnHelpButtonClickedListener(listener: OnHelpButtonClickedListener) = apply {
+            GlobalOption.onHelpButtonClickedListener = listener
+        }
+
+        /** 앱 전역에서 발생하는 Exception 핸들러 등록 */
+        fun registerGlobalExceptionHandler() = apply {
+            exceptionHandler = Thread.getDefaultUncaughtExceptionHandler()?.let { crashlyticsExceptionHandler ->
+                AxGlobalExceptionHandler(application, crashlyticsExceptionHandler)
+            }
+        }
+
+        /** [AxGlobalExceptionHandler] 실행 */
+        fun execute() {
+            exceptionHandler?.let(Thread::setDefaultUncaughtExceptionHandler)
+        }
+    }
 
     /**
      * Full Screen 에러 화면 ([AxErrorActivity])을 띄우기 위한 빌더 클래스

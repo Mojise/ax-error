@@ -64,14 +64,14 @@ afterEvaluate {
 
                 groupId = "com.github.mojise.ax-error" // 깃허브 이름 예제
                 artifactId = "ax-error" // 공개할 라이브러리의 이름 예제
-                version = "1.0.4" // 버전 예제
+                version = "0.0.5-alpha" // 버전 예제
             }
             create<MavenPublication>("release") {
                 from(components["release"])
 
                 groupId = "com.github.mojise.ax-error" // 깃허브 이름 예제
                 artifactId = "ax-error" // 공개할 라이브러리의 이름 예제
-                version = "1.0.4" // 버전 예제
+                version = "0.0.5-alpha" // 버전 예제
             }
         }
     }
